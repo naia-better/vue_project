@@ -11,6 +11,14 @@ import '../src/assets/fonts/iconfont.css'
 import axios from 'axios'
 // 配置请求的根路径
 axios.defaults.baseURL = 'http://vueshop.pixiv.download/api/private/v1/'
+// 需要授权的 API ，必须在请求头中使用 `Authorization` 字段提供 `token` 令牌
+// 通过 axios 请求拦截器添加 token,保证拥有获取数据的权限(在 Vue.prototype.$http = axios 之前)
+axios.interceptors.request.use(config => {
+  // 手动为 header添加 携带Authorization的token
+  config.headers.Authorization = window.sessionStorage.getItem('token')
+  // 必须返回 config,固定写法
+  return config
+})
 // 将 axios 挂载到 Vue 的原型上,使每个组件都可以访问到 $http
 Vue.prototype.$http = axios
 
