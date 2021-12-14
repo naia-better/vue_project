@@ -65,11 +65,12 @@ export default {
         const { data: res } = await this.$http.post('login', this.loginForm)
         if (res.meta.status !== 200) return this.$message.error(('登录失败!'))
         this.$message.success('登录成功!')
+        // console.log(res)
         // 1. 将登录成功的 Token 保存到 sessionStorage 中
         //   1.1 项目中除了登录之外的其他API,必须在登录之后才能访问
         //   1.2 token 只应该在当前网站打开期间有效,所以存储在 sessionStorage(会话级别)
         // 2. 通过编程式导航跳转到后台主页,路由地址式 /home
-        window.sessionStorage.setItem('token', res.meta.token)
+        window.sessionStorage.setItem('token', res.data.token)
         this.$router.push('/home')
       })
     }
