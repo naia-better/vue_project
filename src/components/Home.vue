@@ -4,7 +4,7 @@
     <el-header>
       <div>
         <img src="../assets/heima.png" alt="">
-        <span>后台电商管理系统</span>
+        <span>xxx</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
@@ -21,7 +21,8 @@
             active-text-color="#2C79FC"
             unique-opened :collapse="iscollapse"
             :collapse-transition="false"
-            router> // router 为每个二级菜单开启路由跳转
+            router
+            :default-active="activePath"> // router 为每个二级菜单开启路由跳转
             <!-- 一级菜单 -->
             <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
               <!-- 每一个菜单栏，都应该有一个独属于自己的 index值，这样展开就不会影响其他菜单栏了。注意：只接受字符串 -->
@@ -33,7 +34,7 @@
               </template>
               <!-- 二级菜单 -->
                   <!-- :index="'/'+ subItem.path" 当作跳转地址。注意：需要手动加 / -->
-              <el-menu-item :index="'/'+ subItem.path" v-for="subItem in item.children" :key="subItem.id">
+              <el-menu-item :index="'/'+ subItem.path" v-for="subItem in item.children" :key="subItem.id" @click="saveNavState('/'+ subItem.path)">
                 <template slot="title">
                 <!-- 图标 -->
                 <i class="el-icon-menu"></i>
@@ -73,12 +74,14 @@ export default {
         '145': 'iconfont icon-baobiao'
       },
       // 侧边栏的展开与折叠
-      iscollapse: false
+      iscollapse: false,
+      activePath: ''
     }
   },
   // 在页面刚一加载的时候,就应该显示出侧边栏信息
   created () {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     // 退出功能的实现原理：基于 token的方式实现退出比较简单，只需要销毁本地的 token 即可，这样后续的请求就不会携带 token，必须重新登录生成一个新的 token 才可以访问
@@ -95,8 +98,15 @@ export default {
       this.menulist = res.data
       // console.log(this.menulist)
     },
+    // 点击按钮，实现侧边栏的折叠与展开
     toggleCollapse () {
       this.iscollapse = !this.iscollapse
+    },
+    // 保存激活的二级菜单的链接状态
+    saveNavState (activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      // 解决用户列表一开始没有被激活的bug
+      this.activePath = activePath
     }
   }
 }
