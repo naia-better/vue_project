@@ -19,7 +19,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
+          <el-button icon="el-icon-plus" type="primary" @click="addDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
 
@@ -50,8 +50,8 @@
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUserById(scope.row.id)"></el-button>
             <!-- 分配权限按钮 -->
               <!-- tooltip 添加文字提示功能 -->
-            <el-tooltip effect="dark" content="分配权限" placement="top" :enterable="false">
-               <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+               <el-button type="warning" icon="el-icon-setting" size="mini" @click="setRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -120,6 +120,32 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="editDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="editUserInfo">确 定</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- dialog 分配角色对话框 -->
+      <el-dialog
+        title="分配角色"
+        :visible.sync="setRoleDialogVisible"
+        width="50%"
+        @close="setRoleDialogClosed">
+        <div>
+          <p>当前的用户:{{userInfo.username}}</p>
+          <p>当前的角色:{{userInfo.role_name}}</p>
+          <p>分配新角色:
+            <el-select v-model="selectedRoleId" placeholder="请选择">
+              <el-option
+                v-for="item in roleList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -218,7 +244,16 @@ export default {
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ]
-      }
+      },
+
+      // 控制分配角色的对话框的显示与隐藏
+      setRoleDialogVisible: false,
+      // 保存之前cope.row中的数据，弹框一出来就可以展示
+      userInfo: '',
+      // 获取到的所有角色列表,后面将其渲染到下拉框中
+      roleList: [],
+      // select框中已选中的角色id值
+      selectedRoleId: ''
     }
   },
   created () {
@@ -302,7 +337,7 @@ export default {
         if (res.meta.status !== 200) return this.$message.error('修改失败!')
         // 关闭对话框
         this.editDialogVisible = false
-        // 添加完成后要重新更新一下列表
+        // 修改完成后要重新更新一下列表
         this.getUserList()
         // 提示用户修改成功
         this.$message.success('修改成功!')
@@ -330,8 +365,42 @@ export default {
       this.$message.success('删除用户成功!')
       // 删除成功之后需要重新请求一遍列表
       this.getUserList()
-    }
+    },
 
+    // 点击按钮，展示分配角色对话框
+    async setRole (userInfo) {
+      // 用 scope.row 拿到这一行的数据,并保存在data中，供后续使用
+      this.userInfo = userInfo
+
+      // 在展示所有的对话框之前,获取所有的角色列表
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败!')
+      }
+      this.roleList = res.data
+      this.setRoleDialogVisible = true
+    },
+
+    // 点击确定按钮,提交修改后的信息到服务器
+    async saveRoleInfo () {
+      // 在发起提交请求之前,应该先判断一下用户是否选择了角色
+      if (!this.selectedRoleId) {
+        return this.$message.error('请选择要分配的角色')
+      }
+      const { data: res } = await this.$http.put(`users/${this.userInfo.id}/role`, { rid: this.selectedRoleId })
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配角色失败!')
+      }
+
+      this.getUserList()
+      this.setRoleDialogVisible = false
+      this.$message.success('分配角色成功!')
+    },
+    // 监听关闭对话框后,清空对话框中的信息
+    setRoleDialogClosed () {
+      this.selectedRoleId = ''
+      this.userInfo = {}
+    }
   }
 }
 </script>
