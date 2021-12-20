@@ -216,7 +216,7 @@ export default {
         return this.$message.error('获取用户的列表失败!')
       }
       this.roleList = res.data
-      console.log(this.roleList)
+      // console.log(this.roleList)
     },
     // 监听表单关闭后，清空表单中填写的信息
     addDialogClosed () {
@@ -259,7 +259,7 @@ export default {
       this.$refs.editRoleFormRef.validate(async valid => {
         // eslint-disable-next-line no-useless-return
         if (!valid) return
-        // 可以发起添加用户的网络请求
+        // 可以发起修改用户的网络请求
         const { data: res } = await this.$http.put('roles/' + this.editRoleForm.roleId,
           {
             roleName: this.editRoleForm.roleName,
