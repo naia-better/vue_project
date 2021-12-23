@@ -232,7 +232,7 @@ export default {
       // 根据所选分类的id,和当前所处的面板,获取对应的参数
       const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, { params: { sel: this.activeName } })
       if (res.meta.status !== 200) {
-        return this.$message.error('获取参数失败!')
+        return this.$message.info('只允许为第三级分类设置参数!')
       }
       // console.log(res.data)
       // 循环遍历 res.data ,将其中的 attr_vals 字符串用空格分割,返回一个字符串数组

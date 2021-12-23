@@ -8,6 +8,12 @@ import './assets/css/global.css'
 import '../src/assets/fonts/iconfont.css'
 // 导入vue-table-with-tree-grid
 import TableTree from 'vue-table-with-tree-grid'
+// 导入富文本编辑器组件
+import VueQuillEditor from 'vue-quill-editor'
+// 导入富文本编辑器的样式
+import 'quill/dist/quill.core.css' // import styles
+import 'quill/dist/quill.snow.css' // for snow theme
+import 'quill/dist/quill.bubble.css' // for bubble theme
 
 // 导入 axios
 import axios from 'axios'
@@ -28,6 +34,24 @@ Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 Vue.component('tree-table', TableTree)
+
+// 进行全局的挂载
+Vue.use(VueQuillEditor)
+
+// 定义一个格式化时间的全局过滤器
+Vue.filter('dateFormat', function (originValue) {
+  const dt = new Date(originValue)
+
+  const y = dt.getFullYear()
+  const m = (dt.getMonth() + 1 + '').padStart(2, '0')
+  const d = (dt.getDate() + '').padStart(2, '0')
+
+  const hh = (dt.getHours() + '').padStart(2, '0')
+  const mm = (dt.getMinutes() + '').padStart(2, '0')
+  const ss = (dt.getSeconds() + '').padStart(2, '0')
+
+  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+})
 
 new Vue({
   router,
