@@ -3,7 +3,7 @@
     <!-- 头部区域 -->
     <el-header>
       <div>
-        <img src="../assets/heima.png" alt="">
+        <img src="../assets/icon.png" alt="">
         <span>电商后台管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
@@ -22,7 +22,8 @@
             unique-opened :collapse="iscollapse"
             :collapse-transition="false"
             router
-            :default-active="activePath"> // router 为每个二级菜单开启路由跳转
+            :default-active="activePath">
+            <!-- router 为每个二级菜单开启路由跳转 -->
             <!-- 一级菜单 -->
             <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
               <!-- 每一个菜单栏，都应该有一个独属于自己的 index值，这样展开就不会影响其他菜单栏了。注意：只接受字符串 -->
@@ -131,6 +132,11 @@ export default {
     align-items: center;
     color: #fff;
     font-size: 20px;
+    img {
+      width: 61px;
+      height: 56px;
+      border-radius: 50%;
+    }
     span {
       margin-left: 15px;
     }
